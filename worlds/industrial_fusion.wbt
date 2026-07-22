@@ -1,0 +1,166 @@
+#VRML_SIM R2023b utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/floors/protos/Floor.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/factory/containers/protos/WoodenBox.proto"
+
+WorldInfo {
+  info [
+    "Industrial Robot Sensor Fusion Simulation"
+  ]
+  title "Industrial Sensor Fusion"
+  basicTimeStep 32
+}
+
+Viewpoint {
+  orientation -0.32 0.32 0.89 1.7
+  position 0.25 -4.5 3.2
+}
+
+TexturedBackground {
+}
+
+TexturedBackgroundLight {
+}
+
+Floor {
+  size 10 10
+  tileSize 1 1
+}
+
+# Industrial Obstacles in the environment
+WoodenBox {
+  translation 0 1.8 0.3
+  size 0.6 0.6 0.6
+}
+
+WoodenBox {
+  translation -1.2 2.5 0.3
+  size 0.6 0.6 0.6
+}
+
+# Industrial Mobile Robot Platform equipped for Sensor Fusion
+Robot {
+  translation 0 -2 0.1
+  rotation 0 0 1 1.5708
+  children [
+    # Main Chassis Visual Body
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0.2 0.4 0.8
+        roughness 0.5
+      }
+      geometry Box {
+        size 0.4 0.3 0.15
+      }
+    }
+    
+    # Left Wheel Motor & Hinge
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        axis 0 1 0
+        anchor -0.1 0.17 0
+      }
+      device [
+        RotationalMotor {
+          name "left wheel motor"
+        }
+      ]
+      endPoint Solid {
+        translation -0.1 0.17 0
+        rotation 1 0 0 1.5708
+        children [
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0.1 0.1 0.1
+            }
+            geometry Cylinder {
+              height 0.04
+              radius 0.1
+            }
+          }
+        ]
+        boundingObject Cylinder {
+          height 0.04
+          radius 0.1
+        }
+        physics Physics {
+        }
+      }
+    }
+
+    # Right Wheel Motor & Hinge
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        axis 0 1 0
+        anchor -0.1 -0.17 0
+      }
+      device [
+        RotationalMotor {
+          name "right wheel motor"
+        }
+      ]
+      endPoint Solid {
+        translation -0.1 -0.17 0
+        rotation 1 0 0 1.5708
+        children [
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0.1 0.1 0.1
+            }
+            geometry Cylinder {
+              height 0.04
+              radius 0.1
+            }
+          }
+        ]
+        boundingObject Cylinder {
+          height 0.04
+          radius 0.1
+        }
+        physics Physics {
+        }
+      }
+    }
+
+    # Sensor 1: RGB Camera (Mounted on Front Top)
+    Camera {
+      translation 0.18 0 0.1
+      rotation 0 0 1 0
+      name "camera"
+      fieldOfView 1.047
+      width 640
+      height 480
+    }
+
+    # Sensor 2: LiDAR (Mounted Center Top)
+    Lidar {
+      translation 0 0 0.15
+      name "lidar"
+      horizontalResolution 360
+      fieldOfView 6.28
+      numberOfLayers 1
+      minRange 0.1
+      maxRange 10.0
+    }
+
+    # Sensor 3: Inertial Measurement Unit / IMU (Internal)
+    InertialUnit {
+      translation 0 0 0
+      name "inertial unit"
+    }
+  ]
+  
+  # Physics & Collision Setup
+  boundingObject Box {
+    size 0.4 0.3 0.15
+  }
+  physics Physics {
+    density -1
+    mass 10.0
+  }
+  
+  # Links to your controller script
+  controller "sensor_fusion_controller"
+}
